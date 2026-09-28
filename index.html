@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Liderazgo Aumentado con Inteligencia Artificial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF0F4; --surface:#FFFFFF; --ink:#18202E; --muted:#5A6477; --line:#D3D9E2;
+  --accent:#2F4BD8; --accent-ink:#FFFFFF;
+  --c1:#2F4BD8; --c2:#119C86; --c3:#E0A01A;
+  --track:#DCE2EA; --focus:#2F4BD8;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10141D; --surface:#181E2A; --ink:#E8ECF3; --muted:#9AA4B6; --line:#2A3242;
+    --accent:#6F86FF; --accent-ink:#0E1220;
+    --c1:#6F86FF; --c2:#2FC7AD; --c3:#F2B84A;
+    --track:#2A3242; --focus:#8FA0FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10141D; --surface:#181E2A; --ink:#E8ECF3; --muted:#9AA4B6; --line:#2A3242;
+  --accent:#6F86FF; --accent-ink:#0E1220;
+  --c1:#6F86FF; --c2:#2FC7AD; --c3:#F2B84A;
+  --track:#2A3242; --focus:#8FA0FF;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:1.0625rem; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:860px; margin:0 auto; padding:clamp(2rem,6vw,4.5rem) clamp(1.1rem,4vw,2rem) 4rem}
+
+/* Hero */
+.byline{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:600;
+  font-size:.8rem; letter-spacing:.14em; color:var(--muted); margin:0 0 .9rem;
+}
+h1{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800;
+  font-size:clamp(2.3rem,7vw,4.4rem); line-height:.98; letter-spacing:-.025em;
+  margin:0 0 1.6rem; max-width:13ch;
+}
+.intro{font-size:clamp(1.1rem,2.4vw,1.3rem); color:var(--ink); max-width:38em; margin:0 0 3rem}
+
+/* Questions */
+.q{background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:clamp(1.3rem,4vw,2.2rem); margin-bottom:1.25rem}
+.q-head{display:flex; gap:1rem; align-items:baseline; margin-bottom:1.6rem}
+.q-num{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; font-size:1.6rem;
+  color:var(--accent); line-height:1; flex:0 0 auto;
+}
+.q-text{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:600; font-size:clamp(1.12rem,2.6vw,1.35rem); line-height:1.3; margin:0; max-width:40em}
+
+/* Slider */
+.meter{display:flex; align-items:center; gap:1.25rem}
+.meter-read{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800;
+  font-size:clamp(2.2rem,6vw,3rem); line-height:1; min-width:3.6ch; text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.meter-read small{font-size:.45em; font-weight:600; color:var(--muted); margin-left:.05em}
+.track{position:relative; flex:1; height:48px; cursor:pointer; touch-action:none}
+.track-bg,.track-fill{position:absolute; left:0; top:50%; height:14px; margin-top:-7px; border-radius:99px}
+.track-bg{right:0; background:var(--track)}
+.track-fill{background:var(--accent)}
+.thumb{
+  position:absolute; top:50%; width:34px; height:34px; margin:-17px 0 0 -17px;
+  border-radius:50%; background:var(--surface); border:4px solid var(--accent);
+  box-shadow:0 2px 8px rgba(20,30,60,.22); cursor:grab; outline:none;
+}
+.thumb:active{cursor:grabbing}
+.thumb:focus-visible{box-shadow:0 0 0 4px var(--bg),0 0 0 7px var(--focus)}
+.scale{display:flex; justify-content:space-between; color:var(--muted); font-size:.85rem; margin-top:.35rem; padding-left:calc(3.6ch + 1.25rem)}
+.scale span{font-variant-numeric:tabular-nums}
+
+/* Pie */
+.pie-grid{display:grid; grid-template-columns:minmax(220px,300px) 1fr; gap:clamp(1.2rem,4vw,2.4rem); align-items:center}
+.pie-box{position:relative; width:100%; max-width:300px; margin:0 auto}
+#pie{display:block; width:100%; height:auto; touch-action:none; cursor:pointer; user-select:none; -webkit-user-select:none}
+#pie .pct{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; font-size:22px; fill:#fff; pointer-events:none}
+#pie .h{cursor:grab; outline:none}
+#pie .h circle.ring{fill:var(--surface); stroke:var(--ink); stroke-width:3.5}
+#pie .h:focus-visible circle.ring{stroke:var(--focus); stroke-width:5}
+.pie-hint{text-align:center; color:var(--muted); font-size:.85rem; margin-top:.5rem}
+.legend{list-style:none; margin:0; padding:0; display:grid; gap:1rem}
+.legend li{display:grid; grid-template-columns:14px 1fr; gap:.8rem; align-items:start}
+.sw{width:14px; height:14px; border-radius:4px; margin-top:.35rem}
+.lg-title{display:flex; justify-content:space-between; gap:.6rem; font-weight:600}
+.lg-title b{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; font-variant-numeric:tabular-nums}
+.lg-desc{color:var(--muted); font-size:.92rem; line-height:1.5; margin:.2rem 0 0}
+
+/* Choices */
+.choices{display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem}
+.choice{
+  aspect-ratio:1/1; border-radius:18px; border:2px solid var(--line); background:var(--bg);
+  color:var(--ink); font:inherit; font-weight:600; font-size:1rem; line-height:1.3;
+  padding:1.1rem; text-align:left; display:flex; flex-direction:column; justify-content:space-between;
+  cursor:pointer; transition:border-color .15s, background .15s, transform .15s;
+}
+.choice:hover{border-color:var(--accent)}
+.choice:focus-visible{outline:3px solid var(--focus); outline-offset:3px}
+.choice .dot{width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:grid; place-items:center; transition:all .15s}
+.choice[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.choice[aria-pressed="true"] .dot{border-color:var(--accent-ink); background:var(--accent-ink)}
+.choice[aria-pressed="true"] .dot::after{content:""; width:10px; height:10px; border-radius:50%; background:var(--accent)}
+
+/* Send */
+.send-row{display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:2rem}
+.send:disabled{opacity:.6;cursor:wait}
+.send{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:600; font-size:1.15rem;
+  background:var(--ink); color:var(--bg); border:0; border-radius:99px; padding:1rem 2.2rem; cursor:pointer;
+}
+.send:focus-visible{outline:3px solid var(--focus); outline-offset:3px}
+.err{color:#C0392B; font-size:.95rem; margin:0; min-height:1.4em}
+:root[data-theme="dark"] .err{color:#FF8A7A}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .err{color:#FF8A7A} }
+
+.done{display:none; background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:clamp(1.6rem,5vw,2.8rem)}
+.done h2{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; font-size:clamp(1.8rem,5vw,2.6rem); margin:0 0 .6rem; line-height:1.05}
+.done p{margin:0 0 1.4rem; color:var(--muted)}
+.summary{display:grid; gap:.6rem; margin:0; padding:0; list-style:none}
+.summary li{display:flex; justify-content:space-between; gap:1rem; border-top:1px solid var(--line); padding-top:.6rem}
+.summary span:last-child{font-weight:600; text-align:right}
+
+@media (max-width:640px){
+  .pie-grid{grid-template-columns:1fr}
+  .choices{grid-template-columns:1fr}
+  .choice{aspect-ratio:auto; min-height:92px; flex-direction:row; align-items:center; gap:1rem}
+  .choice .dot{flex:0 0 auto; order:2}
+  .scale{padding-left:0}
+  .meter{flex-direction:column; align-items:stretch; gap:.4rem}
+  .meter-read{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <p class="byline">POR FEDERICO FROS CAMPELO</p>
+    <h1>Liderazgo Aumentado con Inteligencia Artificial</h1>
+    <p class="intro">¡Hola! ¿Cómo estás? Me gustaría que me orientes con cómo te sentís y cómo viene tu experiencia hasta ahora con el recorrido que hicimos en este programa de transformación.</p>
+  </header>
+
+  <div id="form">
+    <!-- 1 -->
+    <section class="q" aria-labelledby="q1t">
+      <div class="q-head"><span class="q-num">1</span>
+        <p class="q-text" id="q1t">Uno de los objetivos de este programa siempre fue aumentar en vos el ingenio aplicado al uso de la IA en tu propio entorno de liderazgo. ¿En qué grado sentís que eso está sucediendo?</p>
+      </div>
+      <div class="meter">
+        <div class="meter-read" aria-hidden="true"><span id="q1v">100</span><small>%</small></div>
+        <div class="track" id="track">
+          <div class="track-bg"></div>
+          <div class="track-fill" id="fill"></div>
+          <div class="thumb" id="thumb" role="slider" tabindex="0" aria-labelledby="q1t" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100 %"></div>
+        </div>
+      </div>
+      <div class="scale" aria-hidden="true"><span>0%</span><span>50%</span><span>100%</span></div>
+    </section>
+
+    <!-- 2 -->
+    <section class="q" aria-labelledby="q2t">
+      <div class="q-head"><span class="q-num">2</span>
+        <p class="q-text" id="q2t">¿En qué proporción considerás que el contenido que estamos recorriendo es estratégico, táctico u operativo?</p>
+      </div>
+      <div class="pie-grid">
+        <div>
+          <div class="pie-box">
+            <svg id="pie" viewBox="0 0 300 300" role="group" aria-label="Distribución entre estratégico, táctico y operativo">
+              <g id="sectors"></g>
+              <g id="labels"></g>
+              <line id="fixed" x1="150" y1="150" x2="150" y2="22" stroke="var(--surface)" stroke-width="3"/>
+              <line id="l1" x1="150" y1="150" stroke="var(--surface)" stroke-width="3"/>
+              <line id="l2" x1="150" y1="150" stroke="var(--surface)" stroke-width="3"/>
+              <circle cx="150" cy="150" r="7" fill="var(--surface)"/>
+              <g class="h" id="h1" tabindex="0" role="slider" aria-label="Límite entre estratégico y táctico"><circle class="ring" r="13"/></g>
+              <g class="h" id="h2" tabindex="0" role="slider" aria-label="Límite entre táctico y operativo"><circle class="ring" r="13"/></g>
+            </svg>
+          </div>
+          <p class="pie-hint">Arrastrá los círculos o tocá la torta</p>
+        </div>
+        <ul class="legend">
+          <li><span class="sw" style="background:var(--c1)"></span><div>
+            <div class="lg-title">Estratégico <b id="p1">33%</b></div>
+            <p class="lg-desc">Cambiar mi mindset y estimularme al cambio de mindset de mis personas. Dotarme de ingenio y acercarme al Leader-Led Design bajo el Leadership Augmentation Framework.</p></div></li>
+          <li><span class="sw" style="background:var(--c2)"></span><div>
+            <div class="lg-title">Táctico <b id="p2">33%</b></div>
+            <p class="lg-desc">Reconocer en mí o en los líderes que me reportan las funciones de liderazgo que me conviene aumentar. Desarrollar pensamiento de workflow en esta exigente industria de procesos intelectuales. Ayudarme a atravesar ciertos túneles y entender los meta-procesos que experimentamos en esta transformación tecnológica. Evaluar los riesgos reales.</p></div></li>
+          <li><span class="sw" style="background:var(--c3)"></span><div>
+            <div class="lg-title">Operativo <b id="p3">34%</b></div>
+            <p class="lg-desc">Generar un espacio de conversación y debate para compartir experiencias internas en un ambiente cuidado, confidencial y controlado. Acercarme a ciertas herramientas que me permitan avanzar en el “cómo” innovador y practicar determinados ejercicios hands-on.</p></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="q" aria-labelledby="q3t">
+      <div class="q-head"><span class="q-num">3</span>
+        <p class="q-text" id="q3t">¿Qué te gustaría ver a continuación?</p>
+      </div>
+      <div class="choices" role="group" aria-labelledby="q3t">
+        <button type="button" class="choice" aria-pressed="false" data-v="Mecanismos de abrumamiento y cómo afrontarlos (coping tactics)"><span class="dot"></span><span>Mecanismos de abrumamiento y cómo afrontarlos (coping tactics)</span></button>
+        <button type="button" class="choice" aria-pressed="false" data-v="Resistencia a la adopción de new tech y Aikido para reducirla"><span class="dot"></span><span>Resistencia a la adopción de new tech y Aikido para reducirla</span></button>
+        <button type="button" class="choice" aria-pressed="false" data-v="Cómo crear alguna Skill en Claude para amplificar mi creatividad"><span class="dot"></span><span>Cómo crear alguna Skill en Claude para amplificar mi creatividad</span></button>
+      </div>
+    </section>
+
+    <div class="send-row">
+      <button type="button" class="send" id="send">Enviar respuestas</button>
+      <p class="err" id="err" role="alert"></p>
+    </div>
+  </div>
+
+  <section class="done" id="done" aria-live="polite">
+    <h2>¡Gracias!</h2>
+    <p>Recibí tus respuestas. Con esto voy a darle forma al cierre del programa.</p>
+    <ul class="summary" id="summary"></ul>
+  </section>
+</main>
+
+<script>
+(function(){
+  /* ---------- Pregunta 1: barra ---------- */
+  var q1 = 100;
+  var track = document.getElementById('track'), fill = document.getElementById('fill'),
+      thumb = document.getElementById('thumb'), q1v = document.getElementById('q1v');
+  function setQ1(v){
+    q1 = Math.max(0, Math.min(100, Math.round(v)));
+    fill.style.width = q1 + '%'; thumb.style.left = q1 + '%';
+    q1v.textContent = q1;
+    thumb.setAttribute('aria-valuenow', q1); thumb.setAttribute('aria-valuetext', q1 + ' %');
+  }
+  function fromX(x){ var r = track.getBoundingClientRect(); setQ1((x - r.left) / r.width * 100); }
+  track.addEventListener('pointerdown', function(e){
+    track.setPointerCapture(e.pointerId); fromX(e.clientX); thumb.focus({preventScroll:true});
+    function mv(ev){ fromX(ev.clientX); }
+    function up(){ track.removeEventListener('pointermove', mv); track.removeEventListener('pointerup', up); track.removeEventListener('pointercancel', up); }
+    track.addEventListener('pointermove', mv); track.addEventListener('pointerup', up); track.addEventListener('pointercancel', up);
+  });
+  thumb.addEventListener('keydown', function(e){
+    var k = e.key, step = e.shiftKey ? 10 : 1;
+    if (k === 'ArrowRight' || k === 'ArrowUp') setQ1(q1 + step);
+    else if (k === 'ArrowLeft' || k === 'ArrowDown') setQ1(q1 - step);
+    else if (k === 'Home') setQ1(0); else if (k === 'End') setQ1(100); else return;
+    e.preventDefault();
+  });
+  setQ1(100);
+
+  /* ---------- Pregunta 2: torta ---------- */
+  // k1, k2 = posiciones de los dos límites móviles en % (el límite de las 12 está fijo)
+  var k1 = 33, k2 = 66;
+  var C = 150, R = 128, NS = 'http://www.w3.org/2000/svg';
+  var svg = document.getElementById('pie'), sectors = document.getElementById('sectors'), labels = document.getElementById('labels');
+  var h1 = document.getElementById('h1'), h2 = document.getElementById('h2');
+  var l1 = document.getElementById('l1'), l2 = document.getElementById('l2');
+  var colors = ['var(--c1)','var(--c2)','var(--c3)'];
+  function pt(pct, r){ var t = pct * 3.6 * Math.PI / 180; return [C + r * Math.sin(t), C - r * Math.cos(t)]; }
+  function arc(p0, p1){
+    var span = p1 - p0; if (span <= 0) return '';
+    if (span >= 100) return 'M'+C+','+(C-R)+' A'+R+','+R+' 0 1,1 '+C+','+(C+R)+' A'+R+','+R+' 0 1,1 '+C+','+(C-R)+'Z';
+    var a = pt(p0, R), b = pt(p1, R);
+    return 'M'+C+','+C+' L'+a[0]+','+a[1]+' A'+R+','+R+' 0 '+(span>50?1:0)+',1 '+b[0]+','+b[1]+'Z';
+  }
+  function vals(){ return [k1, k2 - k1, 100 - k2]; }
+  function drawPie(){
+    var v = vals(), bounds = [[0,k1],[k1,k2],[k2,100]];
+    sectors.innerHTML = ''; labels.innerHTML = '';
+    bounds.forEach(function(b, i){
+      var d = arc(b[0], b[1]); if (!d) return;
+      var p = document.createElementNS(NS,'path'); p.setAttribute('d', d); p.setAttribute('fill', colors[i]); sectors.appendChild(p);
+      if (v[i] >= 7){
+        var m = pt((b[0]+b[1])/2, R*0.6), t = document.createElementNS(NS,'text');
+        t.setAttribute('x', m[0]); t.setAttribute('y', m[1]); t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
+        t.setAttribute('class','pct'); t.textContent = v[i] + '%'; labels.appendChild(t);
+      }
+    });
+    var e1 = pt(k1, R), e2 = pt(k2, R);
+    l1.setAttribute('x2', e1[0]); l1.setAttribute('y2', e1[1]);
+    l2.setAttribute('x2', e2[0]); l2.setAttribute('y2', e2[1]);
+    h1.setAttribute('transform','translate('+e1[0]+','+e1[1]+')');
+    h2.setAttribute('transform','translate('+e2[0]+','+e2[1]+')');
+    document.getElementById('p1').textContent = v[0] + '%';
+    document.getElementById('p2').textContent = v[1] + '%';
+    document.getElementById('p3').textContent = v[2] + '%';
+    h1.setAttribute('aria-valuenow', k1); h1.setAttribute('aria-valuetext', 'Estratégico '+v[0]+' %, táctico '+v[1]+' %');
+    h2.setAttribute('aria-valuenow', k2); h2.setAttribute('aria-valuetext', 'Táctico '+v[1]+' %, operativo '+v[2]+' %');
+  }
+  function pctAt(e){
+    var r = svg.getBoundingClientRect(), s = 300 / r.width;
+    var x = (e.clientX - r.left) * s - C, y = (e.clientY - r.top) * s - C;
+    var deg = Math.atan2(x, -y) * 180 / Math.PI; if (deg < 0) deg += 360;
+    return deg / 3.6;
+  }
+  function setK(which, p){
+    p = Math.round(p);
+    if (which === 1){
+      if (p > k2) p = (p - k2 > 50) ? 0 : k2;
+      k1 = Math.max(0, Math.min(k2, p));
+    } else {
+      if (p < k1) p = (k1 - p > 50) ? 100 : k1;
+      k2 = Math.max(k1, Math.min(100, p));
+    }
+    drawPie();
+  }
+  function circDist(a, b){ var d = Math.abs(a - b) % 100; return Math.min(d, 100 - d); }
+  svg.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    svg.setPointerCapture(e.pointerId);
+    var p0 = pctAt(e), which = 0;
+    var d1 = circDist(p0, k1), d2 = circDist(p0, k2);
+    if (k1 !== k2) which = d1 <= d2 ? 1 : 2;
+    if (which) { setK(which, p0); (which===1?h1:h2).focus({preventScroll:true}); }
+    var last = p0;
+    function mv(ev){
+      var p = pctAt(ev);
+      if (!which){ // límites superpuestos: se decide por la dirección del gesto
+        var delta = ((p - last + 150) % 100) - 50; if (Math.abs(delta) < 0.5) return;
+        which = delta > 0 ? 2 : 1;
+      }
+      setK(which, p); last = p;
+    }
+    function up(){ svg.removeEventListener('pointermove', mv); svg.removeEventListener('pointerup', up); svg.removeEventListener('pointercancel', up); }
+    svg.addEventListener('pointermove', mv); svg.addEventListener('pointerup', up); svg.addEventListener('pointercancel', up);
+  });
+  [[h1,1],[h2,2]].forEach(function(pair){
+    pair[0].addEventListener('keydown', function(e){
+      var k = e.key, cur = pair[1]===1 ? k1 : k2;
+      if (k === 'ArrowRight' || k === 'ArrowUp') setK(pair[1], cur + 1);
+      else if (k === 'ArrowLeft' || k === 'ArrowDown') setK(pair[1], cur - 1);
+      else return;
+      e.preventDefault();
+    });
+  });
+  drawPie();
+
+  /* ---------- Pregunta 3: botones ---------- */
+  var q3 = null, choices = document.querySelectorAll('.choice');
+  choices.forEach(function(b){
+    b.addEventListener('click', function(){
+      choices.forEach(function(o){ o.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true'); q3 = b.getAttribute('data-v');
+      document.getElementById('err').textContent = '';
+    });
+  });
+
+  /* ---------- Enviar ---------- */
+  document.getElementById('send').addEventListener('click', function(){
+    if (!q3){ document.getElementById('err').textContent = 'Elegí qué te gustaría ver a continuación para poder enviar.'; return; }
+    var v = vals();
+    var participante = new URLSearchParams(location.search).get('p') || 'Sin identificar';
+    var answers = {
+      _subject: 'Feedback Liderazgo Aumentado: ' + participante,
+      participante: participante,
+      ingenio_ia: q1 + '%',
+      estrategico: v[0] + '%', tactico: v[1] + '%', operativo: v[2] + '%',
+      proximo_tema: q3,
+      fecha: new Date().toLocaleString('es-AR')
+    };
+    var btn = document.getElementById('send'), err = document.getElementById('err');
+    btn.disabled = true; btn.textContent = 'Enviando…'; err.textContent = '';
+    fetch('https://formspree.io/f/xjykjvbg', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(answers)
+    }).then(function(r){
+      if (!r.ok) throw new Error('status ' + r.status);
+      showDone();
+    }).catch(function(){
+      btn.disabled = false; btn.textContent = 'Enviar respuestas';
+      err.textContent = 'No se pudo enviar. Revisá tu conexión y volvé a tocar “Enviar respuestas”.';
+    });
+    function showDone(){
+    var rows = [
+      ['Ingenio aplicado a la IA', q1 + '%'],
+      ['Estratégico / Táctico / Operativo', v[0]+'% / '+v[1]+'% / '+v[2]+'%'],
+      ['Próximo tema', q3]
+    ];
+    document.getElementById('summary').innerHTML = rows.map(function(r){ return '<li><span>'+r[0]+'</span><span>'+r[1]+'</span></li>'; }).join('');
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+    window.scrollTo(0, 0);
+    }
+  });
+})();
+</script>
+</body>
+</html>
